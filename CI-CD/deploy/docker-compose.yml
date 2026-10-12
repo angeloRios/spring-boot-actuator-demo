@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  sales-api:
+    build: 
+      context: ../../
+      dockerfile: CI-CD/deploy/Dockerfile
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${ENV:-dev}
+      - JAVA_OPTS=-Xms512m -Xmx512m
+    restart: unless-stopped
+    healthcheck:
+      # Validamos usando el endpoint de Actuator que viene en el repo
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
